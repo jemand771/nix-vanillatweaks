@@ -72,10 +72,8 @@ def update_datapack_pack(game_version: str, pack_data: dict, category_name: str)
     hash = None
     if version == existing_version:
         url = read_nix_file_attribute(nix_file, "url")
-        print("reusing url from existing nix file:", "success" if url else "error")
         if url is not None:
             hash = read_nix_file_attribute(nix_file, "hash")
-            print("reusing hash from existing nix file:", "success" if hash else "error")
     if url is None:
         url = make_url_stable(
             get_datapack_download_url(
