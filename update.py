@@ -132,7 +132,7 @@ def get_datapack_download_url(game_version: str, category_name: str, pack_name: 
     j = r.json()
     if j.get("status") != "success":
         raise RuntimeError(r.get("status"))
-    return "https://vanillatweaks.net/" + j["link"]
+    return "https://vanillatweaks.net" + j["link"]
 
 
 def calculate_hash(url: str) -> str:
