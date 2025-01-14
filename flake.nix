@@ -12,7 +12,20 @@
     in {
       legacyPackages = {
         # craftingtweaks = ./craftingtweaks;
-        datapacks = pkgs.callPackage ./datapacks {};
+        datapacks = pkgs.callPackage ./datapacks {
+          mkDatapack = { name, version, url, hash }: pkgs.fetchurl {
+            inherit url hash version;
+            pname = name;
+            nativeBuildInputs = [ pkgs.unzip ];
+            postFetch = ''
+              unzip $out
+              rm $out
+              mv *.zip $out
+              # unit tests 😎
+              unzip -l $out | grep -q pack.mcmeta
+            '';
+            };
+        };
         # resourcepacks = ./resourcepacks;
       };
       devShells.default = pkgs.mkShell {

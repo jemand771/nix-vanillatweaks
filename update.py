@@ -107,20 +107,11 @@ def get_pack_nix_file_url(nix_file: Path) -> str:
 
 
 def write_pack_nix_file(nix_file: Path, name: str, version: str, url: str):
-    nix_file.write_text(f"""{{ pkgs, ... }}:
-pkgs.fetchurl rec {{
-  # pname = "name-colors";
+    nix_file.write_text(f"""{{ mkDatapack, ... }}:
+mkDatapack {{
   version = "{version}";
-  # doesn't work because ??
-  # name = "${{pname}}-${{version}}.zip";
-  name = "{name}-{version}.zip";
+  name = "{name}";
   url = "{url}";
-  nativeBuildInputs = [ pkgs.unzip ];
-  postFetch = ''
-    unzip $out
-    rm $out
-    mv *.zip $out
-  '';
   hash = "{calculate_hash(url)}";
 }}
 """)
@@ -172,10 +163,10 @@ def make_url_stable(url: str) -> str:
 def write_callpackage_mapping(file: Path, entries: list[str], quote_keys: bool=False, suffix: str=""):
     q = '"' if quote_keys else ""
     file.parent.mkdir(parents=True, exist_ok=True)
-    file.write_text(f"""{{ pkgs, ... }}:
+    file.write_text(f"""{{ pkgs, mkDatapack, ... }}:
 {{
 {"\n".join(
-    f'  {q}{entry}{q} = pkgs.callPackage ./{entry}{suffix} {{}};'
+    f'  {q}{entry}{q} = pkgs.callPackage ./{entry}{suffix} {{ inherit mkDatapack; }};'
     for entry in entries
 )}
 }}""")

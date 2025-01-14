@@ -1,9 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, mkDatapack, ... }:
 {
-  decorative-cosmetic = pkgs.callPackage ./decorative-cosmetic {};
-  convenience = pkgs.callPackage ./convenience {};
-  gameplay-changes = pkgs.callPackage ./gameplay-changes {};
-  informative = pkgs.callPackage ./informative {};
-  teleport-commands = pkgs.callPackage ./teleport-commands {};
-  admin-tools = pkgs.callPackage ./admin-tools {};
+  decorative-cosmetic = pkgs.callPackage ./decorative-cosmetic { inherit mkDatapack; };
+  convenience = pkgs.callPackage ./convenience { inherit mkDatapack; };
+  gameplay-changes = pkgs.callPackage ./gameplay-changes { inherit mkDatapack; };
+  informative = pkgs.callPackage ./informative { inherit mkDatapack; };
+  teleport-commands = pkgs.callPackage ./teleport-commands { inherit mkDatapack; };
+  admin-tools = pkgs.callPackage ./admin-tools { inherit mkDatapack; };
 }
