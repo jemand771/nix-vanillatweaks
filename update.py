@@ -26,7 +26,7 @@ def update_datapacks():
         versions,
         quote_keys=True,
     )
-    for version in versions[-1:]:  # XXX
+    for version in versions:
         update_datapack_version(version)
 
 
