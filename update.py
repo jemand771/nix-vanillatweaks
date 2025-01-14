@@ -67,11 +67,15 @@ def update_datapack_pack(game_version: str, pack_data: dict, category_name: str)
     print("fetching datapack", category_name, "/", name, "for", game_version)
     version = pack_data["version"]
     nix_file = Path(f"datapacks/{game_version}/{category_name}/{name}.nix")
-    existing_version = get_pack_nix_file_version(nix_file)
+    existing_version = read_nix_file_attribute(nix_file, "version")
     url = None
+    hash = None
     if version == existing_version:
-        url = get_pack_nix_file_url(nix_file)
+        url = read_nix_file_attribute(nix_file, "url")
         print("reusing url from existing nix file:", "success" if url else "error")
+        if url is not None:
+            hash = read_nix_file_attribute(nix_file, "hash")
+            print("reusing hash from existing nix file:", "success" if hash else "error")
     if url is None:
         url = make_url_stable(
             get_datapack_download_url(
@@ -80,39 +84,33 @@ def update_datapack_pack(game_version: str, pack_data: dict, category_name: str)
                 pack_name=pack_data["name"],
             )
         )
+    if hash is None:
+        hash = calculate_hash(url)
     write_pack_nix_file(
         nix_file=nix_file,
         name=name,
         version=version,
-        url=url
+        url=url,
+        hash=hash,
     )
 
 
-def get_pack_nix_file_version(nix_file: Path) -> str:
+def read_nix_file_attribute(nix_file: Path, attribute: str) -> str:
     if not nix_file.is_file():
         return None
     return re.search(
-        r"version = \"(\d+\.\d+\.\d+)\";",
+        rf"{attribute} = \"([^\"]+)\";",
         nix_file.read_text()
     ).group(1)
 
 
-def get_pack_nix_file_url(nix_file: Path) -> str:
-    if not nix_file.is_file():
-        return None
-    return re.search(
-        r"url = \"([^\"]+)\";",
-        nix_file.read_text()
-    ).group(1)
-
-
-def write_pack_nix_file(nix_file: Path, name: str, version: str, url: str):
+def write_pack_nix_file(nix_file: Path, name: str, version: str, url: str, hash: str):
     nix_file.write_text(f"""{{ mkDatapack, ... }}:
 mkDatapack {{
   version = "{version}";
   name = "{name}";
   url = "{url}";
-  hash = "{calculate_hash(url)}";
+  hash = "{hash}";
 }}
 """)
 
