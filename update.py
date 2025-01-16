@@ -165,7 +165,8 @@ def write_callpackage_mapping(file: Path, entries: list[str], quote_keys: bool=F
     f'  {q}{entry}{q} = pkgs.callPackage ./{entry}{suffix} {{ inherit mkDatapack; }};'
     for entry in entries
 )}
-}}""")
+}}
+""")
 
 
 def sanetize_name(name: str) -> str:
